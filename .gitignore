@@ -1,1 +1,3 @@
-.api-key
+api-key.cfg
+.vscode
+*.csv
