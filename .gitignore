@@ -1,3 +1,5 @@
 api-key.cfg
 .vscode
 *.csv
+*.json
+__pycache__
