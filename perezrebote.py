@@ -32,6 +32,7 @@ def get_tweets(twitter_handle, num_tweets, key_cfg="api-key.cfg"):
         print(e)
         exit(1)
 
+    print("Donwnloading last tweets from @{}".format(twitter_handle))
     tweets = []
     last_tweet = None
     with tqdm(total=num_tweets) as pbar:
@@ -57,7 +58,7 @@ def get_tweets(twitter_handle, num_tweets, key_cfg="api-key.cfg"):
 
 
 def clean(tweet, fields={'full_text', 'id'}):
-    """Strips metadata that won't be used and removes @mentions from all tweets"""
+    "Strips metadata that won't be used and removes @mentions from all tweets"
     clean_tweet = {k:v for k,v in tweet.items() if k in fields}
     clean_tweet['is_retweet'] = 'retweeted_status' in tweet
     clean_tweet['text'] = re.sub(r"@(\w){1,15}", '', clean_tweet['full_text']).strip()
@@ -65,12 +66,14 @@ def clean(tweet, fields={'full_text', 'id'}):
 
 
 def print_help_msg(command):
+    "Prints CLI help message"
     with click.Context(command) as ctx:
         click.echo(command.get_help(ctx))
 
 @click.command()
 @click.option("--username", "-u", 
-              help="Twitter handle to learn from (without @)", 
+              help=("Twitter handle to learn from (without @)."
+                    "Tweets will be stored in a json file"), 
               default=None)
 @click.option("--tweets-json", "-t", 
               help="List of tweets already donloaded. Overrides --username", 

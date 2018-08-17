@@ -37,7 +37,8 @@ class DeepWriter(Callback):
         model.add(Dense(self.y.shape[1], activation='softmax'))
 
         model.compile(loss='categorical_crossentropy', optimizer='adam')
-
+        print("\nModel summary:")
+        model.summary()
         self.model = model
 
     def train(self, epochs, batch_size=100):
@@ -53,7 +54,6 @@ class DeepWriter(Callback):
     def vectorize(text, max_len=40, step=1):
         "Converts the corpus to the structure required by the model"
         chars = sorted(list(set(text)))
-        print('total chars:', len(chars))
         char_indices = dict((c, i) for i, c in enumerate(chars))
         indices_char = dict((i, c) for i, c in enumerate(chars))
 
