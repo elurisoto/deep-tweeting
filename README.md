@@ -1,5 +1,5 @@
 # Perez Rebote
-Script that downloads (or uses an already downloaded list) tweets from a twitter user and tries to imitate his tweeting style.
+Script that downloads (or uses an already downloaded list) tweets from a twitter user and tries to imitate their tweeting style using LSTM networks.
 
 ## Installation
 Considering python 3.6 is already installed, this should be enough:
