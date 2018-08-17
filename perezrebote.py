@@ -6,6 +6,7 @@ from tqdm import tqdm
 from deepwriter import DeepWriter
 
 def api_login(key_cfg):
+    "Logs on twitter with the given api keys"
     keys = configparser.ConfigParser()
     keys.read(key_cfg)
 
@@ -19,6 +20,9 @@ def api_login(key_cfg):
     return tweepy.API(auth)
 
 def get_tweets(twitter_handle, num_tweets, outfile=None, key_cfg="api-key.cfg"):
+    """Gets the last tweets from an user. 
+    Twitter only allows downloading the last ~3400 tweets
+    """
     api = api_login(key_cfg)
     tweets = []
     last_tweet = None
@@ -46,13 +50,14 @@ def get_tweets(twitter_handle, num_tweets, outfile=None, key_cfg="api-key.cfg"):
 
 
 def clean(tweet, fields={'full_text', 'id'}):
+    """Strips metadata that won't be used and removes @mentions from all tweets"""
     clean_tweet = {k:v for k,v in tweet.items() if k in fields}
     clean_tweet['is_retweet'] = 'retweeted_status' in tweet
     clean_tweet['text'] = re.sub(r"@(\w){1,15}", '', clean_tweet['full_text']).strip()
     return clean_tweet
 
 
-if __name__ == "__main__":
+def main():
     # get_tweets("perezreverte", 4000, "reverte.json")
 
     with open("reverte.json", "r") as fin:
@@ -66,9 +71,13 @@ if __name__ == "__main__":
 
     model_config.update({
         "layers": 1,
-        "neurons": 3,
+        "neurons": 150,
         "modelname": "reverte"
     })
 
     model = DeepWriter(**model_config)
-    model.train(1)
+    model.train(epochs=60)
+
+
+if __name__ == "__main__":
+    main()
