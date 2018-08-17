@@ -3,3 +3,4 @@ tqdm
 numpy
 keras
 tensorflow
+click
