@@ -82,18 +82,22 @@ def print_help_msg(command):
 @click.option("--layers", "-l", 
               help="Number of layers of the neural network", 
               default=1, 
-              type=int)
+              type=int,
+              show_default=True)
 @click.option("--neurons", "-n", 
               help="Number of neurons in each layer", 
               default=150, 
-              type=int)
+              type=int,
+              show_default=True)
 @click.option("--epochs", "-e", 
               help="Number of epochs to train for", 
               default=60, 
-              type=int)
+              type=int,
+              show_default=True)
 @click.option("--keys", "-k", 
               help="File where the api keys are stored", 
-              default="api-key.cfg")
+              default="api-key.cfg",
+              show_default=True)
 def main(username, tweets_json, layers, neurons, epochs, keys):
     if tweets_json:
         tweets = json.loads(tweets_json.read())
