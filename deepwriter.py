@@ -53,7 +53,7 @@ class DeepWriter(Callback):
     @staticmethod
     def vectorize(text, max_len=40, step=1):
         "Converts the corpus to the structure required by the model"
-        chars = sorted(list(set(full_text)))
+        chars = sorted(list(set(text)))
         print('total chars:', len(chars))
         char_indices = dict((c, i) for i, c in enumerate(chars))
         indices_char = dict((i, c) for i, c in enumerate(chars))
@@ -61,9 +61,9 @@ class DeepWriter(Callback):
         # cut the text in semi-redundant sequences of maxlen characters
         sentences = []
         next_chars = []
-        for i in range(0, len(full_text) - max_len, step):
-            sentences.append(full_text[i: i + max_len])
-            next_chars.append(full_text[i + max_len])
+        for i in range(0, len(text) - max_len, step):
+            sentences.append(text[i: i + max_len])
+            next_chars.append(text[i + max_len])
 
         x = np.zeros((len(sentences), max_len, len(chars)), dtype=np.bool)
         y = np.zeros((len(sentences), len(chars)), dtype=np.bool)
@@ -107,12 +107,12 @@ class DeepWriter(Callback):
         else:
             diversities = [diversity]
 
-        start_index = random.randint(0, len(full_text) - self.max_len - 1)
+        start_index = random.randint(0, len(self.text) - self.max_len - 1)
         for diversity in diversities:
             print('----- diversity:', diversity)
 
             generated = ''
-            sentence = full_text[start_index: start_index + self.max_len]
+            sentence = self.text[start_index: start_index + self.max_len]
             generated += sentence
             print('----- Generating with seed: "' + sentence + '"')
             sys.stdout.write(generated)
