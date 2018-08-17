@@ -2,8 +2,10 @@ import re
 import configparser
 import tweepy
 import json
+import click
 from tqdm import tqdm
 from deepwriter import DeepWriter
+
 
 def api_login(key_cfg):
     "Logs on twitter with the given api keys"
@@ -19,11 +21,17 @@ def api_login(key_cfg):
     auth.set_access_token(access_token, access_token_secret)
     return tweepy.API(auth)
 
-def get_tweets(twitter_handle, num_tweets, outfile=None, key_cfg="api-key.cfg"):
+def get_tweets(twitter_handle, num_tweets, key_cfg="api-key.cfg"):
     """Gets the last tweets from an user. 
     Twitter only allows downloading the last ~3400 tweets
     """
-    api = api_login(key_cfg)
+    try:
+        api = api_login(key_cfg)
+    except tweepy.error.TweepError as e:
+        print("[ERROR] Problem authenticating")
+        print(e)
+        exit(1)
+
     tweets = []
     last_tweet = None
     with tqdm(total=num_tweets) as pbar:
@@ -42,9 +50,8 @@ def get_tweets(twitter_handle, num_tweets, outfile=None, key_cfg="api-key.cfg"):
     print("Downloaded {} tweets.".format(len(tweets)))
     tweets = [tweet._json for tweet in tweets]
 
-    if outfile:
-        with open(outfile, 'w') as fout:
-            json.dump(tweets, fout)
+    with open("{}.json".format(twitter_handle), 'w') as fout:
+        json.dump(tweets, fout)
 
     return tweets
 
@@ -57,11 +64,42 @@ def clean(tweet, fields={'full_text', 'id'}):
     return clean_tweet
 
 
-def main():
-    # get_tweets("perezreverte", 4000, "reverte.json")
+def print_help_msg(command):
+    with click.Context(command) as ctx:
+        click.echo(command.get_help(ctx))
 
-    with open("reverte.json", "r") as fin:
-        tweets = json.loads(fin.read())
+@click.command()
+@click.option("--username", "-u", 
+              help="Twitter handle to learn from (without @)", 
+              default=None)
+@click.option("--tweets-json", "-t", 
+              help="List of tweets already donloaded. Overrides --username", 
+              type=click.File(),
+              default=None)
+@click.option("--layers", "-l", 
+              help="Number of layers of the neural network", 
+              default=1, 
+              type=int)
+@click.option("--neurons", "-n", 
+              help="Number of neurons in each layer", 
+              default=150, 
+              type=int)
+@click.option("--epochs", "-e", 
+              help="Number of epochs to train for", 
+              default=60, 
+              type=int)
+@click.option("--keys", "-k", 
+              help="File where the api keys are stored", 
+              default="api-key.cfg")
+def main(username, tweets_json, layers, neurons, epochs, keys):
+    if tweets_json:
+        tweets = json.loads(tweets_json.read())
+    elif username:
+        tweets = get_tweets(username, 4000, keys)
+    else:
+        print("\n[ERROR] You must specify a twitter username or a tweets json file.\n")
+        print_help_msg(main)
+        exit(1)
 
     clean_tweets = [clean(tweet) for tweet in tweets]
     corpus = [tweet['text'] for tweet in clean_tweets if not tweet['is_retweet']]
@@ -70,13 +108,13 @@ def main():
     model_config = DeepWriter.vectorize(full_text)
 
     model_config.update({
-        "layers": 1,
-        "neurons": 150,
-        "modelname": "reverte"
+        "layers": layers,
+        "neurons": neurons,
+        "modelname": username
     })
 
     model = DeepWriter(**model_config)
-    model.train(epochs=60)
+    model.train(epochs=epochs)
 
 
 if __name__ == "__main__":
