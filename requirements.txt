@@ -1,0 +1,5 @@
+tweepy
+tqdm
+numpy
+keras
+tensorflow
