@@ -101,6 +101,7 @@ def print_help_msg(command):
 def main(username, tweets_json, layers, neurons, epochs, keys):
     if tweets_json:
         tweets = json.loads(tweets_json.read())
+        username, _ = tweets_json.name.split('.')
     elif username:
         tweets = get_tweets(username, 4000, keys)
     else:
