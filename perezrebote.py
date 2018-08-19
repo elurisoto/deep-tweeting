@@ -51,7 +51,7 @@ def get_tweets(twitter_handle, num_tweets, key_cfg="api-key.cfg"):
     print("Downloaded {} tweets.".format(len(tweets)))
     tweets = [tweet._json for tweet in tweets]
 
-    with open("{}.json".format(twitter_handle), 'w') as fout:
+    with open("data/{}.json".format(twitter_handle), 'w') as fout:
         json.dump(tweets, fout)
 
     return tweets

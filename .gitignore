@@ -3,3 +3,4 @@ api-key.cfg
 *.csv
 *.json
 __pycache__
+data/*
