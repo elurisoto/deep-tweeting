@@ -100,6 +100,7 @@ class DeepWriter(Callback):
         self.talk(400)
 
     def get_seed(self):
+        "Gets a seed sentence. Only picks beginnings of lines"
         line_starts = [m.start() for m in re.finditer(r"^.", self.text, flags=re.M|re.S) 
                        if m.start() < len(self.text) - self.max_len - 1]
         start_index = random.choice(line_starts)
@@ -114,8 +115,6 @@ class DeepWriter(Callback):
 
         sentence = self.get_seed()
         for diversity in diversities:
-            print('----- diversity:', diversity)
-
             generated = sentence
             print('----- Generating with seed: "' + sentence + '"')
             sys.stdout.write(generated)
