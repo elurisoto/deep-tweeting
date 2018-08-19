@@ -1,6 +1,7 @@
 import json
 import time
 import random
+import re
 import sys
 import numpy as np
 from keras.models import Sequential
@@ -96,8 +97,13 @@ class DeepWriter(Callback):
         "Function invoked at end of each epoch. Prints generated text."
         print()
         print('----- Generating text after Epoch: %d' % epoch)
-        self.talk(400, [0.2, 0.5, 1.0, 1.2])
+        self.talk(400)
 
+    def get_seed(self):
+        line_starts = [m.start() for m in re.finditer(r"^.", self.text, flags=re.M|re.S) 
+                       if m.start() < len(self.text) - self.max_len - 1]
+        start_index = random.choice(line_starts)
+        return self.text[start_index: start_index + self.max_len]
 
     def talk(self, n_chars, diversity=1):
         "Generates a message of n_chars"
@@ -106,13 +112,11 @@ class DeepWriter(Callback):
         else:
             diversities = [diversity]
 
-        start_index = random.randint(0, len(self.text) - self.max_len - 1)
+        sentence = self.get_seed()
         for diversity in diversities:
             print('----- diversity:', diversity)
 
-            generated = ''
-            sentence = self.text[start_index: start_index + self.max_len]
-            generated += sentence
+            generated = sentence
             print('----- Generating with seed: "' + sentence + '"')
             sys.stdout.write(generated)
 
