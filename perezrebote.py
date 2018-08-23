@@ -1,4 +1,5 @@
 import re
+from os.path import splitext, basename
 import configparser
 import tweepy
 import json
@@ -101,7 +102,8 @@ def print_help_msg(command):
 def main(username, tweets_json, layers, neurons, epochs, keys):
     if tweets_json:
         tweets = json.loads(tweets_json.read())
-        username, _ = tweets_json.name.split('.')
+        username, _ = splitext(basename(tweets_json.name))
+        
     elif username:
         tweets = get_tweets(username, 4000, keys)
     else:
