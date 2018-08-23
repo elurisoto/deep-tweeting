@@ -31,10 +31,10 @@ class DeepWriter(Callback):
         model.add(LSTM(self.neurons, input_shape=(self.x.shape[1], self.x.shape[2]), return_sequences=True))
         model.add(Dropout(0.2))
         for _ in range(self.layers-1):
-            model.add(LSTM(self.neurons))
+            model.add(LSTM(self.neurons, return_sequences=True))
             model.add(Dropout(0.2))
-        if self.layers==1:
-            model.add(Flatten())
+        
+        model.add(Flatten())
         model.add(Dense(self.y.shape[1], activation='softmax'))
 
         model.compile(loss='categorical_crossentropy', optimizer='adam')
@@ -125,7 +125,7 @@ class DeepWriter(Callback):
                     x_pred[0, t, self.char_indices[char]] = 1.
 
                 preds = self.model.predict(x_pred, verbose=0)[0]
-                next_index = self.sample(preds, diversity)
+                next_index = DeepWriter.sample(preds, diversity)
                 next_char = self.indices_char[next_index]
 
                 generated += next_char
